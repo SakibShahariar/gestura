@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Validate project files
+        run: |
+          test -s README.md
+          test -s AGENTS.md
+          test -s LICENSE
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          metadata_path = Path("metadata.json")
+          if metadata_path.exists():
+              metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+              required = ("uuid", "name", "description", "shell-version")
+              missing = [key for key in required if key not in metadata]
+              if missing:
+                  raise SystemExit(f"metadata.json is missing: {', '.join(missing)}")
+              if metadata["uuid"] != "gestura@sakibshahariar.github.io":
+                  raise SystemExit("metadata.json UUID does not match Gestura's UUID")
+              if not isinstance(metadata["shell-version"], list) or not metadata["shell-version"]:
+                  raise SystemExit("metadata.json shell-version must be a non-empty list")
+          print("Repository documentation and available metadata are valid.")
+          PY
+
+      - name: Check patch whitespace
+        run: git diff --check
