@@ -38,6 +38,15 @@ Run the recognizer unit tests with:
 npm test
 ```
 
+To build an installable bundle, include the helper module explicitly — `gnome-extensions pack` does not pick up arbitrary `.js` files on its own:
+
+```sh
+gnome-extensions pack --extra-source=gestureRecognizer.js
+gnome-extensions install --force gestura@sakibshahariar.github.io.shell-extension.zip
+```
+
+GNOME Shell 51 discovers newly installed extensions only at startup, so log out and back in after installing.
+
 See [AGENTS.md](AGENTS.md) for project rules and development expectations. The implementation roadmap is tracked in [GitHub Issues](https://github.com/SakibShahariar/gestura/issues).
 
 ## License
