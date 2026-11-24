@@ -45,5 +45,8 @@ jobs:
           print("Repository documentation and available metadata are valid.")
           PY
 
+      - name: Run gesture recognizer tests
+        run: node --test tests/*.test.js
+
       - name: Check patch whitespace
         run: git diff --check

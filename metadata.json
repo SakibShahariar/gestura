@@ -1,0 +1,8 @@
+{
+  "uuid": "gestura@sakibshahariar.github.io",
+  "name": "Gestura",
+  "description": "Customizable four-finger touchpad gestures for window management on GNOME Wayland.",
+  "shell-version": ["51"],
+  "version-name": "0.1.0",
+  "version": 1
+}

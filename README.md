@@ -13,11 +13,13 @@ These are the only gestures in the initial scope. Workspace switching and other 
 
 ## Project status
 
-**Early development — gesture capture is not implemented yet.**
+**Early development — gesture recognition is implemented; window actions are not wired up yet.**
 
-The first engineering task is to verify that a GNOME Shell extension can reliably recognize and claim four-finger vertical touchpad swipes on GNOME Wayland without breaking GNOME's built-in gestures. GNOME/Mutter gesture handling has changed across releases, and built-in four-finger behavior can conflict with custom actions.
+A capture-phase GJS handler on the Shell stage feeds a pure, unit-tested recognizer that claims four-finger vertical swipes while leaving three-finger, horizontal, diagonal, cancelled, and modal-mode gestures to GNOME. Recognized gestures are currently logged to the Shell journal; minimizing and restoring windows are tracked in issues #3 and #4.
 
-The initial development target is GNOME Shell 51 on Wayland. Compatibility with other GNOME versions and X11 will be stated only after testing.
+In `NORMAL` mode, Gestura intentionally replaces GNOME's four-finger swipe-up-to-overview gesture. The overview remains available via the keyboard, hot corner, and Activities button. Three-finger and four-finger horizontal gestures are untouched.
+
+The initial development target is GNOME Shell 51 on Wayland. No other GNOME version or X11 support is claimed. See [docs/wayland-gesture-investigation.md](docs/wayland-gesture-investigation.md) for API evidence and the verification status; live Shell/hardware verification of the gesture flow is still pending.
 
 ## Design goals
 
@@ -30,9 +32,13 @@ The initial development target is GNOME Shell 51 on Wayland. Compatibility with 
 
 ## Development
 
-See [AGENTS.md](AGENTS.md) for project rules and development expectations.
+Run the recognizer unit tests with:
 
-The implementation roadmap is tracked in [GitHub Issues](https://github.com/SakibShahariar/gestura/issues).
+```sh
+npm test
+```
+
+See [AGENTS.md](AGENTS.md) for project rules and development expectations. The implementation roadmap is tracked in [GitHub Issues](https://github.com/SakibShahariar/gestura/issues).
 
 ## License
 
