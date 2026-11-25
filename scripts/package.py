@@ -24,7 +24,6 @@ RUNTIME_FILES = (
     "windowActions.js",
     "windowHistory.js",
     "windowTracker.js",
-    "windowFilters.js",
     "schemas/org.gnome.shell.extensions.gestura.gschema.xml",
 )
 

@@ -49,7 +49,7 @@ gnome-extensions enable gestura@sakibshahariar.github.io
 
 ## Preferences
 
-Open with `gnome-extensions prefs gestura@sakibshahariar.github.io` or the gear icon in Extension Manager. You can independently disable each gesture, adjust sensitivity (40-300 unaccelerated units, default 100), skip fullscreen windows (off by default), and exclude applications by WM class (empty by default). Excluded windows are never minimized and never enter the restore stack. Settings persist via GSettings.
+Open with `gnome-extensions prefs gestura@sakibshahariar.github.io` or the gear icon in Extension Manager. You can independently disable each gesture and adjust sensitivity (40-300 unaccelerated units, default 100). Settings persist via GSettings.
 
 ## Troubleshooting
 
