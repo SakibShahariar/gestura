@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 RUNTIME_FILES = (
     "metadata.json",
     "extension.js",
+    "actionFeedback.js",
     "prefs.js",
     "gestureRecognizer.js",
     "windowActions.js",

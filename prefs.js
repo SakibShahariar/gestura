@@ -46,5 +46,13 @@ export default class GesturaPreferences extends ExtensionPreferences {
         group.add(threshold);
         settings.bind('action-threshold', threshold.adjustment, 'value',
             Gio.SettingsBindFlags.DEFAULT);
+
+        const feedback = new Adw.SwitchRow({
+            title: 'Show on-screen feedback',
+            subtitle: 'Display an icon when a gesture performs or skips an action.',
+        });
+        settings.bind('show-osd', feedback, 'active',
+            Gio.SettingsBindFlags.DEFAULT);
+        group.add(feedback);
     }
 }

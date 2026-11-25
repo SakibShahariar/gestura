@@ -17,6 +17,13 @@
         window.
       </description>
     </key>
+    <key name="show-osd" type="b">
+      <default>true</default>
+      <summary>Show gesture feedback</summary>
+      <description>
+        Show an on-screen icon when a gesture performs or skips an action.
+      </description>
+    </key>
     <key name="action-threshold" type="i">
       <range min="40" max="300"/>
       <default>100</default>

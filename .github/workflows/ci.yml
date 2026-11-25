@@ -63,6 +63,7 @@ jobs:
           expected = {
               "metadata.json",
               "extension.js",
+              "actionFeedback.js",
               "prefs.js",
               "gestureRecognizer.js",
               "windowActions.js",

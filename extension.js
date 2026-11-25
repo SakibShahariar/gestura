@@ -1,10 +1,12 @@
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
+import {feedbackFor} from './actionFeedback.js';
 import {
     Direction,
     GesturePhase,
@@ -133,6 +135,21 @@ export default class GesturaExtension extends Extension {
         console.log(`Gestura: swipe ${direction} -> ${action} ` +
             `${performed ? 'performed' : 'no-op'} ` +
             `(distance=${distance.toFixed(1)}, time=${time})`);
+
+        const feedback = feedbackFor(action, performed);
+        this._showFeedback(feedback);
+    }
+
+    _showFeedback({iconName, label}) {
+        if (!this._settings.get_boolean('show-osd') || !Main.osdWindowManager)
+            return;
+
+        try {
+            Main.osdWindowManager.showAll(
+                Gio.Icon.new_for_string(iconName), label, null, -1);
+        } catch (error) {
+            console.log(`Gestura: could not show OSD feedback: ${error}`);
+        }
     }
 
     _isEligible(window) {
