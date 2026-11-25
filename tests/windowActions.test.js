@@ -30,15 +30,14 @@ function makeWindow(id = 1) {
     };
 }
 
-test('minimizes an eligible focused window and records it', () => {
+test('minimizes an eligible focused window without owning history', () => {
     const {actions, history} = makeActions();
     const window = makeWindow();
     const display = {get_focus_window: () => window};
 
     assert.equal(actions.minimizeFocused(display), true);
     assert.equal(window.minimizeCalls, 1);
-    assert.equal(history.size, 1);
-    assert.equal(history.pop(), window);
+    assert.equal(history.size, 0, 'WindowTracker, not the action, records minimization');
 });
 
 test('no focused window is a harmless no-op', () => {

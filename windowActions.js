@@ -22,7 +22,7 @@ export class WindowActions {
             if (window.can_minimize?.() === false)
                 return false;
             window.minimize();
-            this._history.push(window);
+            // WindowTracker observes notify::minimized and owns the history.
             return true;
         } catch {
             return false;

@@ -34,6 +34,13 @@ export class WindowHistory {
         return true;
     }
 
+    /** Remove a specific window from the history. */
+    remove(window) {
+        const before = this._windows.length;
+        this._windows = this._windows.filter(entry => entry !== window);
+        return this._windows.length !== before;
+    }
+
     /** Return the newest still-eligible window, discarding stale entries. */
     pop() {
         while (this._windows.length > 0) {

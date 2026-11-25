@@ -23,6 +23,7 @@ RUNTIME_FILES = (
     "gestureRecognizer.js",
     "windowActions.js",
     "windowHistory.js",
+    "windowTracker.js",
     "schemas/org.gnome.shell.extensions.gestura.gschema.xml",
 )
 

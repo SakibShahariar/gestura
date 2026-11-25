@@ -103,6 +103,14 @@ State flow for one physical gesture:
 5. `END` finalizes a claimed gesture; `CANCEL` finalizes it without firing.
    Finger-count changes mid-gesture cancel recognition.
 
+Minimized-window history is maintained independently by `windowTracker.js`.
+Mutter 51 exposes no global `window-minimized` signal, so the tracker connects
+to `Meta.Display::window-created`, then to each window's
+`notify::minimized` and `unmanaged` signals. Windows that already exist when
+the extension is enabled are seeded from `list_all_windows()`. This makes the
+LIFO stack reflect minimizations from any source, not just Gestura's own
+`minimize()` call. All handlers are disconnected on disable.
+
 The classification threshold is intentionally **below** GNOME Shell 51's
 16-unit threshold. Because capture handlers run first, Gestura consumes the
 event at which Shell's tracker would otherwise reach its own threshold, so

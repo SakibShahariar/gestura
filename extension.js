@@ -12,6 +12,7 @@ import {
 } from './gestureRecognizer.js';
 import {WindowActions} from './windowActions.js';
 import {WindowHistory} from './windowHistory.js';
+import {WindowTracker} from './windowTracker.js';
 
 const ELIGIBLE_TYPES = [
     Meta.WindowType.NORMAL,
@@ -30,6 +31,12 @@ export default class GesturaExtension extends Extension {
             history: this._history,
             isEligible: window => this._isEligible(window),
         });
+        this._tracker = new WindowTracker({
+            display: global.display,
+            history: this._history,
+            isEligible: window => this._isEligible(window),
+        });
+        this._tracker.start();
         this._recognizer = new GestureRecognizer({
             actionThreshold: this._settings.get_int('action-threshold'),
             onGesture: ({direction, distance, time}) =>
@@ -58,6 +65,8 @@ export default class GesturaExtension extends Extension {
 
         this._recognizer?.reset();
         this._recognizer = null;
+        this._tracker?.stop();
+        this._tracker = null;
         this._history?.reset();
         this._history = null;
         this._actions = null;

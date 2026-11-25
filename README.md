@@ -16,7 +16,7 @@ These are the only gestures in the initial scope. Workspace switching and other 
 **Implemented and verified on GNOME Shell 51 / Wayland with a physical touchpad.** A capture-phase GJS handler on the Shell stage feeds a pure, unit-tested recognizer that claims four-finger vertical swipes while leaving three-finger, horizontal, diagonal, cancelled, and modal-mode gestures to GNOME.
 
 - Swipe down minimizes the focused, eligible window (never closes it).
-- Swipe up restores the most recently window minimized by Gestura (LIFO). Closed/stale entries are discarded and an empty history is a no-op. Mutter 51 exposes no reliable global minimize signal, so windows minimized by other means are not tracked.
+- Swipe up restores the most recently minimized window (LIFO), regardless of how it was minimized. `windowTracker.js` watches `window-created` and each window's `notify::minimized` (Mutter 51 has no global minimize signal); unminimized and closed windows are removed from the stack. An empty history is a no-op.
 - Defaults are both actions enabled and a 100-unit sensitivity threshold; see Preferences below.
 
 In `NORMAL` mode, Gestura intentionally replaces GNOME's four-finger swipe-up-to-overview gesture. The overview remains available via the keyboard, hot corner, and Activities button. Three-finger and four-finger horizontal gestures are untouched.

@@ -44,6 +44,19 @@ test('a re-minimized window is not duplicated', () => {
     assert.equal(history.pop(), window);
 });
 
+test('remove discards a specific entry', () => {
+    const history = new WindowHistory();
+    const first = {id: 1};
+    const second = {id: 2};
+    history.push(first);
+    history.push(second);
+
+    assert.equal(history.remove(first), true);
+    assert.equal(history.remove(first), false);
+    assert.equal(history.size, 1);
+    assert.equal(history.pop(), second);
+});
+
 test('reset clears the history', () => {
     const history = new WindowHistory();
     history.push({id: 1});
