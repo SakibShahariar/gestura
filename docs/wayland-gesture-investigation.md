@@ -136,6 +136,10 @@ revisited; this dependency is documented here rather than hidden in code.
       2026-11-25 07:34:20-23 (GNOME Shell 51.1, Wayland, DLL07A0 touchpad).
       The overview was not left active after those swipes, consistent with
       Gestura claiming the gesture before Shell's tracker.
+- [x] **Window actions verified on hardware.** With the action bundle loaded,
+      the journal at 2026-11-25 09:56 shows alternating
+      `minimize performed` / `restore performed` lines, including two
+      minimizes followed by two restores, confirming LIFO stack behavior.
 
 ### Verification checklist (GNOME 51, Wayland)
 
