@@ -13,13 +13,15 @@ These are the only gestures in the initial scope. Workspace switching and other 
 
 ## Project status
 
-**Early development — gesture recognition is implemented; window actions are not wired up yet.**
+**Implemented and verified on GNOME Shell 51 / Wayland with a physical touchpad.** A capture-phase GJS handler on the Shell stage feeds a pure, unit-tested recognizer that claims four-finger vertical swipes while leaving three-finger, horizontal, diagonal, cancelled, and modal-mode gestures to GNOME.
 
-A capture-phase GJS handler on the Shell stage feeds a pure, unit-tested recognizer that claims four-finger vertical swipes while leaving three-finger, horizontal, diagonal, cancelled, and modal-mode gestures to GNOME. Recognized gestures are currently logged to the Shell journal; minimizing and restoring windows are tracked in issues #3 and #4.
+- Swipe down minimizes the focused, eligible window (never closes it).
+- Swipe up restores the most recently window minimized by Gestura (LIFO). Closed/stale entries are discarded and an empty history is a no-op. Mutter 51 exposes no reliable global minimize signal, so windows minimized by other means are not tracked.
+- Defaults are both actions enabled and a 100-unit sensitivity threshold; see Preferences below.
 
 In `NORMAL` mode, Gestura intentionally replaces GNOME's four-finger swipe-up-to-overview gesture. The overview remains available via the keyboard, hot corner, and Activities button. Three-finger and four-finger horizontal gestures are untouched.
 
-The initial development target is GNOME Shell 51 on Wayland. No other GNOME version or X11 support is claimed. Four-finger up/down recognition has been verified on a live GNOME 51 Wayland session with a physical touchpad. See [docs/wayland-gesture-investigation.md](docs/wayland-gesture-investigation.md) for API evidence and the verification checklist.
+Only GNOME Shell 51 on Wayland is supported/tested. No X11 or other version support is claimed. See [docs/wayland-gesture-investigation.md](docs/wayland-gesture-investigation.md) for API evidence and the verification checklist.
 
 ## Design goals
 
@@ -30,24 +32,40 @@ The initial development target is GNOME Shell 51 on Wayland. No other GNOME vers
 - Provide native GNOME preferences for the supported actions and sensitivity.
 - Never claim support for an untested GNOME version or touchpad.
 
-## Development
+## Installation
 
-Run the recognizer unit tests with:
-
-```sh
-npm test
-```
-
-To build an installable bundle, include the helper module explicitly — `gnome-extensions pack` does not pick up arbitrary `.js` files on its own:
+GNOME Shell 51 discovers newly installed extensions only at startup, and Extension Manager 0.7.0 cannot install local extensions. Build and install from source:
 
 ```sh
-gnome-extensions pack --extra-source=gestureRecognizer.js
+python3 scripts/package.py          # needs glib-compile-schemas
 gnome-extensions install --force gestura@sakibshahariar.github.io.shell-extension.zip
 ```
 
-GNOME Shell 51 discovers newly installed extensions only at startup, so log out and back in after installing.
+Log out and back in, then enable “Gestura” in Extension Manager or with:
 
-See [AGENTS.md](AGENTS.md) for project rules and development expectations. The implementation roadmap is tracked in [GitHub Issues](https://github.com/SakibShahariar/gestura/issues).
+```sh
+gnome-extensions enable gestura@sakibshahariar.github.io
+```
+
+## Preferences
+
+Open with `gnome-extensions prefs gestura@sakibshahariar.github.io` or the gear icon in Extension Manager. You can independently disable each gesture and adjust sensitivity (40-300 unaccelerated units, default 100). Settings persist via GSettings.
+
+## Troubleshooting
+
+- **Not listed after install:** log out/in; GNOME 51 does not scan extension directories while running.
+- **No action on a swipe:** check the two switches in Preferences, make sure a normal/dialog window has focus, and confirm the swipe is long enough. The Shell journal logs each gesture as `performed` or `no-op`.
+- **Swipe-up no longer opens Overview:** intentional in normal mode. Use Super, the Activities button, or the hot corner.
+- **Need to remove it:** `gnome-extensions uninstall gestura@sakibshahariar.github.io`, then log out/in.
+
+## Development
+
+```sh
+npm test                             # pure logic unit tests
+python3 scripts/package.py           # reproducible distributable ZIP
+```
+
+The packaging script uses an explicit file list, so development-only files (tests, docs, CI config) are never shipped. See [AGENTS.md](AGENTS.md) for project rules and [GitHub Issues](https://github.com/SakibShahariar/gestura/issues) for the roadmap.
 
 ## License
 

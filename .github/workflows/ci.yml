@@ -42,11 +42,42 @@ jobs:
                   raise SystemExit("metadata.json UUID does not match Gestura's UUID")
               if not isinstance(metadata["shell-version"], list) or not metadata["shell-version"]:
                   raise SystemExit("metadata.json shell-version must be a non-empty list")
-          print("Repository documentation and available metadata are valid.")
+              if metadata.get("settings-schema") != "org.gnome.shell.extensions.gestura":
+                  raise SystemExit("metadata.json settings-schema does not match Gestura's schema")
+          print("Repository documentation and metadata are valid.")
           PY
 
-      - name: Run gesture recognizer tests
+      - name: Run unit tests
         run: node --test tests/*.test.js
+
+      - name: Build extension bundle
+        run: |
+          python3 scripts/package.py gestura@sakibshahariar.github.io.shell-extension.zip
+          python3 - <<'PY'
+          import zipfile
+
+          name = "gestura@sakibshahariar.github.io.shell-extension.zip"
+          expected = {
+              "metadata.json",
+              "extension.js",
+              "prefs.js",
+              "gestureRecognizer.js",
+              "windowActions.js",
+              "windowHistory.js",
+              "schemas/org.gnome.shell.extensions.gestura.gschema.xml",
+              "schemas/gschemas.compiled",
+          }
+          with zipfile.ZipFile(name) as bundle:
+              actual = set(bundle.namelist())
+          missing = expected - actual
+          if missing:
+              raise SystemExit(f"bundle is missing: {', '.join(sorted(missing))}")
+          forbidden = {p for p in actual if p.startswith(("tests/", "docs/", "scripts/", ".github/"))}
+          forbidden |= actual & {"package.json", "AGENTS.md", "LICENSE", "README.md"}
+          if forbidden:
+              raise SystemExit(f"bundle contains development-only files: {', '.join(sorted(forbidden))}")
+          print("Extension bundle is valid.")
+          PY
 
       - name: Check patch whitespace
         run: git diff --check
