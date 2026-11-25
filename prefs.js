@@ -62,10 +62,9 @@ export default class GesturaPreferences extends ExtensionPreferences {
         exclusions.add(fullscreen);
 
         const apps = new Adw.EntryRow({
-            title: 'Excluded applications (comma-separated WM classes)',
+            title: 'Excluded applications',
+            subtitle: 'Comma-separated WM class names, for example: firefox, org.gnome.Nautilus',
         });
-        apps.set_tooltip_text(
-            'Comma-separated WM class names, for example: firefox, org.gnome.Nautilus');
         apps.set_text(settings.get_strv('excluded-apps').join(', '));
         apps.connect('changed', () => {
             const values = apps.get_text().split(',').map(value => value.trim()).filter(Boolean);
