@@ -156,6 +156,9 @@ revisited; this dependency is documented here rather than hidden in code.
       Gestura are restored by swipe up. Journal at 2026-11-25 16:54-16:56
       shows consecutive `restore performed` lines and a `restore no-op` for an
       empty stack.
+- [x] **OSD feedback verified on hardware.** The maintainer confirmed the OSD
+      appears for performed and no-op gestures and disappears when the
+      preference is disabled; no Gestura/OSD errors appeared in the journal.
 
 ### Verification checklist (GNOME 51, Wayland)
 
