@@ -75,5 +75,19 @@ export default class GesturaPreferences extends ExtensionPreferences {
         settings.bind('diagonal-strictness', strictness, 'selected',
             Gio.SettingsBindFlags.DEFAULT);
         group.add(strictness);
+
+        const diagnostics = new Adw.PreferencesGroup({
+            title: 'Diagnostics',
+            description: 'Optional detailed logging for troubleshooting gestures.',
+        });
+        page.add(diagnostics);
+
+        const verbose = new Adw.SwitchRow({
+            title: 'Verbose gesture logging',
+            subtitle: 'Log every swipe event to the journal. Off by default.',
+        });
+        settings.bind('verbose-logging', verbose, 'active',
+            Gio.SettingsBindFlags.DEFAULT);
+        diagnostics.add(verbose);
     }
 }

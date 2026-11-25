@@ -20,6 +20,7 @@ RUNTIME_FILES = (
     "metadata.json",
     "extension.js",
     "actionFeedback.js",
+    "diagnostics.js",
     "prefs.js",
     "gestureRecognizer.js",
     "windowActions.js",
