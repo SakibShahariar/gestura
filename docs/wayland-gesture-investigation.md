@@ -140,6 +140,9 @@ revisited; this dependency is documented here rather than hidden in code.
       the journal at 2026-11-25 09:56 shows alternating
       `minimize performed` / `restore performed` lines, including two
       minimizes followed by two restores, confirming LIFO stack behavior.
+- [x] **Preferences verified on hardware.** With an action disabled in
+      Preferences, the journal at 2026-11-25 10:05:37-39 shows
+      `swipe up ignored (disabled in preferences)` and no restore action.
 
 ### Verification checklist (GNOME 51, Wayland)
 
