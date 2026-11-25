@@ -159,6 +159,10 @@ revisited; this dependency is documented here rather than hidden in code.
 - [x] **OSD feedback verified on hardware.** The maintainer confirmed the OSD
       appears for performed and no-op gestures and disappears when the
       preference is disabled; no Gestura/OSD errors appeared in the journal.
+- [x] **Focus-on-restore verified on hardware.** Enabling the preference
+      focuses the restored window; disabling it restores Mutter's default
+      behavior. Journal at 2026-11-25 23:06-23:08 shows normal performed
+      restores with no errors.
 
 ### Verification checklist (GNOME 51, Wayland)
 
