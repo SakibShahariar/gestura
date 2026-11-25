@@ -17,14 +17,6 @@
         window.
       </description>
     </key>
-    <key name="verbose-logging" type="b">
-      <default>false</default>
-      <summary>Verbose gesture logging</summary>
-      <description>
-        Log every touchpad swipe event with phase, finger count, deltas and
-        claim decision. Off by default.
-      </description>
-    </key>
     <key name="diagonal-strictness" type="i">
       <range min="0" max="2"/>
       <default>1</default>

@@ -7,7 +7,6 @@ import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 import {feedbackFor} from './actionFeedback.js';
-import {formatDiagnosticLine} from './diagnostics.js';
 import {
     Direction,
     GesturePhase,
@@ -90,32 +89,22 @@ export default class GesturaExtension extends Extension {
         if (event.type() !== Clutter.EventType.TOUCHPAD_SWIPE)
             return Clutter.EVENT_PROPAGATE;
 
-        const phase = this._phaseFor(event.get_gesture_phase());
-        const fingerCount = event.get_touchpad_gesture_finger_count();
-        const [dx, dy] = event.get_gesture_motion_delta_unaccelerated();
-        let claimed = false;
-
         // Leave overview, lock-screen and modal input modes untouched.
-        if (phase && (Main.actionMode & Shell.ActionMode.NORMAL) !== 0) {
-            claimed = this._recognizer.handleEvent({
-                phase,
-                fingerCount,
-                dx,
-                dy,
-                time: event.get_time(),
-            });
-        }
+        if ((Main.actionMode & Shell.ActionMode.NORMAL) === 0)
+            return Clutter.EVENT_PROPAGATE;
 
-        if (this._settings.get_boolean('verbose-logging')) {
-            console.log(formatDiagnosticLine({
-                phase: phase ?? 'UNKNOWN',
-                fingerCount,
-                dx,
-                dy,
-                claimed,
-                mode: Main.actionMode,
-            }));
-        }
+        const phase = this._phaseFor(event.get_gesture_phase());
+        if (!phase)
+            return Clutter.EVENT_PROPAGATE;
+
+        const [dx, dy] = event.get_gesture_motion_delta_unaccelerated();
+        const claimed = this._recognizer.handleEvent({
+            phase,
+            fingerCount: event.get_touchpad_gesture_finger_count(),
+            dx,
+            dy,
+            time: event.get_time(),
+        });
 
         return claimed ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
     }
