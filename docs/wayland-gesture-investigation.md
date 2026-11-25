@@ -151,6 +151,11 @@ revisited; this dependency is documented here rather than hidden in code.
 - [x] **Preferences verified on hardware.** With an action disabled in
       Preferences, the journal at 2026-11-25 10:05:37-39 shows
       `swipe up ignored (disabled in preferences)` and no restore action.
+- [x] **Global minimize tracking verified on hardware.** After loading the
+      tracker bundle, the maintainer confirmed that windows minimized outside
+      Gestura are restored by swipe up. Journal at 2026-11-25 16:54-16:56
+      shows consecutive `restore performed` lines and a `restore no-op` for an
+      empty stack.
 
 ### Verification checklist (GNOME 51, Wayland)
 
