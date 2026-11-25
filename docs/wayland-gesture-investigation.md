@@ -129,22 +129,22 @@ revisited; this dependency is documented here rather than hidden in code.
       three-finger rejection, cancellation, reversal, reset, malformed deltas.
 - [x] Physical touchpad with gesture capability confirmed present via
       `libinput list-devices`.
-- [ ] **Unverified on a live Shell:** no synthetic four-finger swipe was
-      injected into the running GNOME Shell during this investigation. GNOME
-      Shell 51 only scans extension directories at startup (live directory
-      monitoring was removed), and restarting the compositor would have ended
-      the user session, so the stage event flow was verified from source and
-      from an existing production extension rather than by executing Gestura
-      in the running Shell. No hardware-testing claim is made.
+- [x] **Verified on a live Shell with a physical touchpad.** After installing
+      the bundle and logging back in, the extension loaded with no errors and
+      the Shell journal showed one line per gesture:
+      `four-finger swipe up` / `down recognized (distance=100.5..114.0)` on
+      2026-11-25 07:34:20-23 (GNOME Shell 51.1, Wayland, DLL07A0 touchpad).
+      The overview was not left active after those swipes, consistent with
+      Gestura claiming the gesture before Shell's tracker.
 
-### Manual verification checklist (GNOME 51, Wayland)
+### Verification checklist (GNOME 51, Wayland)
 
-1. Install the extension and log out/in (restart is required to load it).
-2. `journalctl -f` and watch for `Gestura: four-finger swipe up/down recognized`.
-3. Four-finger swipe up and down on a physical touchpad: each should produce
-   exactly one log line and must not open the overview.
-4. Three-finger vertical/horizontal swipes and four-finger horizontal swipes:
-   no Gestura log line; GNOME's own gestures still work.
-5. Small four-finger movements: no log line.
-6. Abort a swipe mid-way: no log line.
-7. Disable/re-enable the extension between gestures: no stale actions.
+- [x] Install the bundle and log out/in (restart is required to load it).
+- [x] Watch `journalctl` for `Gestura: four-finger swipe up/down recognized`.
+- [x] Four-finger up and down on a physical touchpad: one log line per gesture,
+      no overview left active.
+- [ ] Three-finger vertical/horizontal swipes and four-finger horizontal swipes:
+      no Gestura log line; GNOME's own gestures still work.
+- [ ] Small four-finger movements: no log line.
+- [ ] Abort a swipe mid-way: no log line.
+- [ ] Disable/re-enable the extension between gestures: no stale actions.

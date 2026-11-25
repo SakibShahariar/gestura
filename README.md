@@ -19,7 +19,7 @@ A capture-phase GJS handler on the Shell stage feeds a pure, unit-tested recogni
 
 In `NORMAL` mode, Gestura intentionally replaces GNOME's four-finger swipe-up-to-overview gesture. The overview remains available via the keyboard, hot corner, and Activities button. Three-finger and four-finger horizontal gestures are untouched.
 
-The initial development target is GNOME Shell 51 on Wayland. No other GNOME version or X11 support is claimed. See [docs/wayland-gesture-investigation.md](docs/wayland-gesture-investigation.md) for API evidence and the verification status; live Shell/hardware verification of the gesture flow is still pending.
+The initial development target is GNOME Shell 51 on Wayland. No other GNOME version or X11 support is claimed. Four-finger up/down recognition has been verified on a live GNOME 51 Wayland session with a physical touchpad. See [docs/wayland-gesture-investigation.md](docs/wayland-gesture-investigation.md) for API evidence and the verification checklist.
 
 ## Design goals
 
