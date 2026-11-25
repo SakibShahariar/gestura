@@ -17,6 +17,22 @@
         window.
       </description>
     </key>
+    <key name="exclude-fullscreen" type="b">
+      <default>false</default>
+      <summary>Skip fullscreen windows</summary>
+      <description>
+        Do not minimize fullscreen windows and do not add them to the restore
+        history. Disabled by default.
+      </description>
+    </key>
+    <key name="excluded-apps" type="as">
+      <default>[]</default>
+      <summary>Excluded applications</summary>
+      <description>
+        WM class names of applications that Gestura must never minimize.
+        Empty by default.
+      </description>
+    </key>
     <key name="action-threshold" type="i">
       <range min="40" max="300"/>
       <default>100</default>

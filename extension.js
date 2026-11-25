@@ -13,6 +13,7 @@ import {
 import {WindowActions} from './windowActions.js';
 import {WindowHistory} from './windowHistory.js';
 import {WindowTracker} from './windowTracker.js';
+import {isWindowEligible} from './windowFilters.js';
 
 const ELIGIBLE_TYPES = [
     Meta.WindowType.NORMAL,
@@ -136,15 +137,11 @@ export default class GesturaExtension extends Extension {
     }
 
     _isEligible(window) {
-        try {
-            if (window.is_destroyed?.())
-                return false;
-            if (!ELIGIBLE_TYPES.includes(window.get_window_type()))
-                return false;
-            return window.can_minimize() === true;
-        } catch {
-            return false;
-        }
+        return isWindowEligible(window, {
+            eligibleTypes: ELIGIBLE_TYPES,
+            excludeFullscreen: this._settings.get_boolean('exclude-fullscreen'),
+            excludedApps: this._settings.get_strv('excluded-apps'),
+        });
     }
 
     _isStale(window) {

@@ -27,7 +27,7 @@ export default class GesturaPreferences extends ExtensionPreferences {
 
         const restore = new Adw.SwitchRow({
             title: 'Swipe up restores the last minimized window',
-            subtitle: 'Restores windows minimized by Gestura in reverse order.',
+            subtitle: 'Restores the most recently minimized window, however it was minimized.',
         });
         settings.bind('enable-restore', restore, 'active',
             Gio.SettingsBindFlags.DEFAULT);
@@ -46,5 +46,30 @@ export default class GesturaPreferences extends ExtensionPreferences {
         group.add(threshold);
         settings.bind('action-threshold', threshold.adjustment, 'value',
             Gio.SettingsBindFlags.DEFAULT);
+
+        const exclusions = new Adw.PreferencesGroup({
+            title: 'Exclusions',
+            description: 'Excluded windows are never minimized and never enter the restore history.',
+        });
+        page.add(exclusions);
+
+        const fullscreen = new Adw.SwitchRow({
+            title: 'Skip fullscreen windows',
+            subtitle: 'Off by default.',
+        });
+        settings.bind('exclude-fullscreen', fullscreen, 'active',
+            Gio.SettingsBindFlags.DEFAULT);
+        exclusions.add(fullscreen);
+
+        const apps = new Adw.EntryRow({
+            title: 'Excluded applications',
+            subtitle: 'Comma-separated WM class names, for example: firefox, org.gnome.Nautilus',
+        });
+        apps.set_text(settings.get_strv('excluded-apps').join(', '));
+        apps.connect('changed', () => {
+            const values = apps.get_text().split(',').map(value => value.trim()).filter(Boolean);
+            settings.set_strv('excluded-apps', values);
+        });
+        exclusions.add(apps);
     }
 }
