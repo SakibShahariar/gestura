@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.gestura"
+          path="/org/gnome/shell/extensions/gestura/">
+    <key name="enable-minimize" type="b">
+      <default>true</default>
+      <summary>Minimize on swipe down</summary>
+      <description>
+        Allow a four-finger swipe down to minimize the focused window.
+      </description>
+    </key>
+    <key name="enable-restore" type="b">
+      <default>true</default>
+      <summary>Restore on swipe up</summary>
+      <description>
+        Allow a four-finger swipe up to restore the most recently minimized
+        window.
+      </description>
+    </key>
+    <key name="action-threshold" type="i">
+      <range min="40" max="300"/>
+      <default>100</default>
+      <summary>Gesture sensitivity</summary>
+      <description>
+        Distance in unaccelerated touchpad units a four-finger vertical swipe
+        must travel before the configured action runs.
+      </description>
+    </key>
+  </schema>
+</schemalist>

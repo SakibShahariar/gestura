@@ -3,6 +3,7 @@
   "name": "Gestura",
   "description": "Customizable four-finger touchpad gestures for window management on GNOME Wayland.",
   "shell-version": ["51"],
+  "settings-schema": "org.gnome.shell.extensions.gestura",
   "version-name": "0.1.0",
   "version": 1
 }
