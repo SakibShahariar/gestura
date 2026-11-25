@@ -50,6 +50,9 @@ jobs:
       - name: Run unit tests
         run: node --test tests/*.test.js
 
+      - name: Benchmark gesture recognizer
+        run: npm run benchmark
+
       - name: Build extension bundle
         run: |
           python3 scripts/package.py gestura@sakibshahariar.github.io.shell-extension.zip

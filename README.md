@@ -62,6 +62,7 @@ Open with `gnome-extensions prefs gestura@sakibshahariar.github.io` or the gear 
 
 ```sh
 npm test                             # pure logic unit tests
+npm run benchmark                    # recognizer hot-path µs/event + CI guard
 python3 scripts/package.py           # reproducible distributable ZIP
 ```
 
