@@ -49,7 +49,7 @@ gnome-extensions enable gestura@sakibshahariar.github.io
 
 ## Preferences
 
-Open with `gnome-extensions prefs gestura@sakibshahariar.github.io` or the gear icon in Extension Manager. You can independently disable each gesture, adjust sensitivity (40-300 unaccelerated units, default 100), toggle on-screen feedback (on by default), and optionally focus restored windows (off by default, leaving focus to Mutter). Settings persist via GSettings.
+Open with `gnome-extensions prefs gestura@sakibshahariar.github.io` or the gear icon in Extension Manager. You can independently disable each gesture, adjust sensitivity (40-300 unaccelerated units, default 100), toggle on-screen feedback (on by default), optionally focus restored windows (off by default, leaving focus to Mutter), and choose vertical swipe strictness: Relaxed (ratio 1.0), Balanced (2.0, default), or Strict (3.0). Stricter settings hand more diagonal swipes back to GNOME's overview tracker. Settings persist via GSettings.
 
 ## Troubleshooting
 

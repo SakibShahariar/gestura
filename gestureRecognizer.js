@@ -13,6 +13,20 @@ export const Direction = Object.freeze({
     DOWN: 'down',
 });
 
+export const STRICTNESS_PRESETS = Object.freeze([
+    {label: 'Relaxed', ratio: 1},
+    {label: 'Balanced', ratio: 2},
+    {label: 'Strict', ratio: 3},
+]);
+
+/** Map a stored preset index to the recognizer's diagonal ratio. */
+export function ratioForStrictness(index) {
+    const value = Number(index);
+    if (!Number.isInteger(value) || value < 0 || value >= STRICTNESS_PRESETS.length)
+        return STRICTNESS_PRESETS[1].ratio;
+    return STRICTNESS_PRESETS[value].ratio;
+}
+
 const State = Object.freeze({
     IDLE: 'idle',
     PENDING: 'pending',

@@ -5,6 +5,8 @@ import {
     Direction,
     GesturePhase,
     GestureRecognizer,
+    STRICTNESS_PRESETS,
+    ratioForStrictness,
 } from '../gestureRecognizer.js';
 
 function makeRecognizer(options = {}) {
@@ -166,6 +168,29 @@ test('non-finite deltas are treated as zero', () => {
 test('classification threshold is kept below GNOME Shell 51 threshold', () => {
     const {recognizer} = makeRecognizer({classifyThreshold: 100});
     assert.equal(recognizer.classifyThreshold, 15);
+});
+
+test('strictness presets map to documented ratios', () => {
+    assert.deepEqual(STRICTNESS_PRESETS.map(p => p.ratio), [1, 2, 3]);
+    assert.deepEqual([0, 1, 2].map(ratioForStrictness), [1, 2, 3]);
+});
+
+test('invalid strictness falls back to balanced', () => {
+    assert.equal(ratioForStrictness(-1), 2);
+    assert.equal(ratioForStrictness(9), 2);
+    assert.equal(ratioForStrictness('nope'), 2);
+});
+
+test('strictness changes whether a diagonal swipe is claimed', () => {
+    const relaxed = makeRecognizer({diagonalRatio: ratioForStrictness(0)});
+    send(relaxed.recognizer, GesturePhase.BEGIN, 4);
+    assert.equal(send(relaxed.recognizer, GesturePhase.UPDATE, 4, 10, 15), true);
+    send(relaxed.recognizer, GesturePhase.END, 4);
+
+    const balanced = makeRecognizer({diagonalRatio: ratioForStrictness(1)});
+    send(balanced.recognizer, GesturePhase.BEGIN, 4);
+    assert.equal(send(balanced.recognizer, GesturePhase.UPDATE, 4, 10, 15), false);
+    send(balanced.recognizer, GesturePhase.END, 4);
 });
 
 test('configuration is validated', () => {

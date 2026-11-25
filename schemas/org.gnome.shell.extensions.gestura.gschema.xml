@@ -17,6 +17,15 @@
         window.
       </description>
     </key>
+    <key name="diagonal-strictness" type="i">
+      <range min="0" max="2"/>
+      <default>1</default>
+      <summary>Vertical swipe strictness</summary>
+      <description>
+        0 = Relaxed (ratio 1.0), 1 = Balanced (ratio 2.0), 2 = Strict
+        (ratio 3.0). Higher values require a straighter vertical swipe.
+      </description>
+    </key>
     <key name="focus-restored-window" type="b">
       <default>false</default>
       <summary>Focus restored windows</summary>

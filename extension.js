@@ -11,6 +11,7 @@ import {
     Direction,
     GesturePhase,
     GestureRecognizer,
+    ratioForStrictness,
 } from './gestureRecognizer.js';
 import {WindowActions} from './windowActions.js';
 import {WindowHistory} from './windowHistory.js';
@@ -41,6 +42,8 @@ export default class GesturaExtension extends Extension {
         this._tracker.start();
         this._recognizer = new GestureRecognizer({
             actionThreshold: this._settings.get_int('action-threshold'),
+            diagonalRatio: ratioForStrictness(
+                this._settings.get_int('diagonal-strictness')),
             onGesture: ({direction, distance, time}) =>
                 this._onGesture(direction, distance, time),
         });
@@ -48,6 +51,10 @@ export default class GesturaExtension extends Extension {
         this._settingsId = this._settings.connect('changed::action-threshold', () => {
             this._recognizer.actionThreshold =
                 this._settings.get_int('action-threshold');
+        });
+        this._strictnessId = this._settings.connect('changed::diagonal-strictness', () => {
+            this._recognizer.diagonalRatio = ratioForStrictness(
+                this._settings.get_int('diagonal-strictness'));
         });
 
         // Capture phase runs before GNOME Shell's own swipe trackers, which
@@ -64,6 +71,9 @@ export default class GesturaExtension extends Extension {
         if (this._settingsId)
             this._settings.disconnect(this._settingsId);
         this._settingsId = null;
+        if (this._strictnessId)
+            this._settings.disconnect(this._strictnessId);
+        this._strictnessId = null;
 
         this._recognizer?.reset();
         this._recognizer = null;

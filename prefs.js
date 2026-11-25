@@ -4,6 +4,8 @@ import Gtk from 'gi://Gtk';
 
 import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
+import {STRICTNESS_PRESETS} from './gestureRecognizer.js';
+
 export default class GesturaPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         const settings = this.getSettings();
@@ -62,5 +64,16 @@ export default class GesturaPreferences extends ExtensionPreferences {
         settings.bind('focus-restored-window', focusRestored, 'active',
             Gio.SettingsBindFlags.DEFAULT);
         group.add(focusRestored);
+
+        const strictness = new Adw.ComboRow({
+            title: 'Vertical swipe strictness',
+            subtitle: 'Relaxed accepts more diagonal movement; Strict requires a straighter swipe.',
+            model: new Gtk.StringList({
+                strings: STRICTNESS_PRESETS.map(preset => preset.label),
+            }),
+        });
+        settings.bind('diagonal-strictness', strictness, 'selected',
+            Gio.SettingsBindFlags.DEFAULT);
+        group.add(strictness);
     }
 }
