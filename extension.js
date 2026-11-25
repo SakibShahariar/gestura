@@ -128,9 +128,14 @@ export default class GesturaExtension extends Extension {
             return;
         }
 
+        const focusWindow = action === 'restore' &&
+            this._settings.get_boolean('focus-restored-window')
+            ? window => window.focus(global.get_current_time())
+            : null;
+
         const performed = action === 'minimize'
             ? this._actions.minimizeFocused(global.display)
-            : this._actions.restoreLast();
+            : this._actions.restoreLast({focusWindow});
 
         console.log(`Gestura: swipe ${direction} -> ${action} ` +
             `${performed ? 'performed' : 'no-op'} ` +

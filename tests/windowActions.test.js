@@ -84,6 +84,36 @@ test('restores the newest window once', () => {
     assert.equal(actions.restoreLast(), false);
 });
 
+test('optionally focuses the restored window', () => {
+    const {actions, history} = makeActions();
+    const window = makeWindow();
+    history.push(window);
+    let focused = null;
+
+    assert.equal(actions.restoreLast({focusWindow: w => { focused = w; }}), true);
+    assert.equal(focused, window);
+});
+
+test('focus failures do not invalidate a successful restore', () => {
+    const {actions, history} = makeActions();
+    history.push(makeWindow());
+
+    assert.equal(actions.restoreLast({
+        focusWindow: () => { throw new Error('no focus'); },
+    }), true);
+});
+
+test('focus is not called when unminimize fails', () => {
+    const {actions, history} = makeActions();
+    const window = makeWindow();
+    window.unminimize = () => { throw new Error('gone'); };
+    history.push(window);
+    let called = false;
+
+    assert.equal(actions.restoreLast({focusWindow: () => { called = true; }}), false);
+    assert.equal(called, false);
+});
+
 test('empty history is a no-op', () => {
     const {actions} = makeActions();
     assert.equal(actions.restoreLast(), false);

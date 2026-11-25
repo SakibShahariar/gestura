@@ -17,6 +17,14 @@
         window.
       </description>
     </key>
+    <key name="focus-restored-window" type="b">
+      <default>false</default>
+      <summary>Focus restored windows</summary>
+      <description>
+        Explicitly focus a window after restoring it. Off by default, which
+        leaves focus handling to Mutter.
+      </description>
+    </key>
     <key name="show-osd" type="b">
       <default>true</default>
       <summary>Show gesture feedback</summary>

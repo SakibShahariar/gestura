@@ -54,5 +54,13 @@ export default class GesturaPreferences extends ExtensionPreferences {
         settings.bind('show-osd', feedback, 'active',
             Gio.SettingsBindFlags.DEFAULT);
         group.add(feedback);
+
+        const focusRestored = new Adw.SwitchRow({
+            title: 'Focus restored windows',
+            subtitle: 'Off by default; leave focus handling to GNOME.',
+        });
+        settings.bind('focus-restored-window', focusRestored, 'active',
+            Gio.SettingsBindFlags.DEFAULT);
+        group.add(focusRestored);
     }
 }

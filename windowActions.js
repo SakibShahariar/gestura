@@ -29,17 +29,29 @@ export class WindowActions {
         }
     }
 
-    /** Restore the most recently minimized window. Returns success. */
-    restoreLast() {
+    /**
+     * Restore the most recently minimized window. Returns success.
+     * `focusWindow`, when provided, is called with the restored window after
+     * unminimizing; failures there never invalidate the restore itself.
+     */
+    restoreLast({focusWindow = null} = {}) {
         const window = this._history.pop();
         if (!window)
             return false;
 
         try {
             window.unminimize();
-            return true;
         } catch {
             return false;
         }
+
+        if (focusWindow) {
+            try {
+                focusWindow(window);
+            } catch {
+                // Focusing is optional; the restore already succeeded.
+            }
+        }
+        return true;
     }
 }
