@@ -163,6 +163,9 @@ revisited; this dependency is documented here rather than hidden in code.
       focuses the restored window; disabling it restores Mutter's default
       behavior. Journal at 2026-11-25 23:06-23:08 shows normal performed
       restores with no errors.
+- [x] **Strictness presets verified on hardware.** Diagonal swipes follow the
+      selected Relaxed/Balanced/Strict preset and preset changes apply without
+      logout; vertical swipes still perform normally (2026-11-25 23:47-23:48).
 
 ### Verification checklist (GNOME 51, Wayland)
 
