@@ -1,62 +1,124 @@
 # Gestura
 
-A GNOME Shell extension for customizable multi-finger touchpad gestures, starting with two window-management actions.
+A GNOME Shell extension that turns **four-finger vertical touchpad swipes** into
+window actions. No daemon, no root access, no broad input-device permissions —
+just an in-process GJS extension.
 
-## Initial gestures
+## Features
 
 | Gesture | Action |
 | --- | --- |
-| Four-finger swipe down | Minimize the focused window |
-| Four-finger swipe up | Restore the most recently minimized window |
+| Four-finger swipe down | Minimize the focused, eligible window (never closes it) |
+| Four-finger swipe up | Restore the most recently minimized window (LIFO) |
 
-These are the only gestures in the initial scope. Workspace switching and other gesture actions are not part of the default feature set.
+The restore stack includes windows minimized **by any method** — Gestura watches
+Mutter's window signals, so clicking a minimize button or using Alt+F7 also adds
+to the stack. Unminimized and closed windows are removed; an empty stack is a
+harmless no-op.
 
-## Project status
+Three-finger gestures, four-finger horizontal swipes, diagonal swipes (subject
+to the strictness setting), cancelled gestures, and non-`NORMAL` input modes are
+passed through to GNOME untouched.
 
-**Implemented and verified on GNOME Shell 51 / Wayland with a physical touchpad.** A capture-phase GJS handler on the Shell stage feeds a pure, unit-tested recognizer that claims four-finger vertical swipes while leaving three-finger, horizontal, diagonal, cancelled, and modal-mode gestures to GNOME.
+## Requirements
 
-- Swipe down minimizes the focused, eligible window (never closes it).
-- Swipe up restores the most recently minimized window (LIFO), regardless of how it was minimized. `windowTracker.js` watches `window-created` and each window's `notify::minimized` (Mutter 51 has no global minimize signal); unminimized and closed windows are removed from the stack. An empty history is a no-op.
-- Defaults are both actions enabled and a 100-unit sensitivity threshold; see Preferences below.
+- GNOME Shell **51** on **Wayland**
+- A touchpad that reports four-finger swipe gestures through libinput
+- `glib-compile-schemas` for building the bundle (provided by GLib tools)
 
-In `NORMAL` mode, Gestura intentionally replaces GNOME's four-finger swipe-up-to-overview gesture. The overview remains available via the keyboard, hot corner, and Activities button. Three-finger and four-finger horizontal gestures are untouched.
-
-Only GNOME Shell 51 on Wayland is supported/tested. No X11 or other version support is claimed. See [docs/wayland-gesture-investigation.md](docs/wayland-gesture-investigation.md) for API evidence and the verification checklist.
-
-## Design goals
-
-- Prefer an in-process GNOME Shell extension using GJS.
-- Avoid a background daemon, root access, or broad input-device permissions unless investigation proves they are necessary.
-- Keep gesture recognition separate from window actions.
-- Handle cancelled gestures, destroyed windows, and extension disable/re-enable safely.
-- Provide native GNOME preferences for the supported actions and sensitivity.
-- Never claim support for an untested GNOME version or touchpad.
+No other GNOME version or X11 support is claimed. For the API investigation and
+verification evidence, see [docs/wayland-gesture-investigation.md](docs/wayland-gesture-investigation.md).
 
 ## Installation
 
-GNOME Shell 51 discovers newly installed extensions only at startup, and Extension Manager 0.7.0 cannot install local extensions. Build and install from source:
+### 1. Build and install a bundle (recommended)
 
 ```sh
-python3 scripts/package.py          # needs glib-compile-schemas
+git clone https://github.com/SakibShahariar/gestura.git
+cd gestura
+python3 scripts/package.py
 gnome-extensions install --force gestura@sakibshahariar.github.io.shell-extension.zip
 ```
 
-Log out and back in, then enable “Gestura” in Extension Manager or with:
+GNOME Shell 51 only discovers new extensions **at startup**, so log out and
+back in. Then enable the extension:
 
 ```sh
 gnome-extensions enable gestura@sakibshahariar.github.io
 ```
 
+> Extension Manager 0.7.0 cannot install local extensions — it only installs
+> from extensions.gnome.org. Use the bundle method above.
+
+### 2. Development install (symlink)
+
+For working directly from the checkout:
+
+```sh
+git clone https://github.com/SakibShahariar/gestura.git
+ln -s "$PWD/gestura" \
+  ~/.local/share/gnome-shell/extensions/gestura@sakibshahariar.github.io
+```
+
+Log out and back in, then enable it with `gnome-extensions enable` or in
+Extension Manager. After changing code, log out/in again to reload it.
+
+### Enable, disable, update, uninstall
+
+```sh
+gnome-extensions enable gestura@sakibshahariar.github.io
+gnome-extensions disable gestura@sakibshahariar.github.io
+gnome-extensions prefs gestura@sakibshahariar.github.io
+
+# Update: rebuild, install with --force, then log out/in
+python3 scripts/package.py
+gnome-extensions install --force gestura@sakibshahariar.github.io.shell-extension.zip
+
+# Remove: uninstall, then log out/in
+gnome-extensions uninstall gestura@sakibshahariar.github.io
+```
+
 ## Preferences
 
-Open with `gnome-extensions prefs gestura@sakibshahariar.github.io` or the gear icon in Extension Manager. You can independently disable each gesture, adjust sensitivity (40-300 unaccelerated units, default 100), toggle on-screen feedback (on by default), optionally focus restored windows (off by default, leaving focus to Mutter), and choose vertical swipe strictness: Relaxed (ratio 1.0), Balanced (2.0, default), or Strict (3.0). Stricter settings hand more diagonal swipes back to GNOME's overview tracker. Settings persist via GSettings.
+Open with `gnome-extensions prefs gestura@sakibshahariar.github.io` or the gear
+icon in Extension Manager.
+
+| Setting | Default | Notes |
+| --- | --- | --- |
+| Minimize on swipe down | On | Requires a focused normal/dialog window |
+| Restore on swipe up | On | Restores the newest minimized window |
+| Gesture sensitivity | 100 | 40-300 unaccelerated units before an action fires |
+| Vertical swipe strictness | Balanced | Relaxed (1.0), Balanced (2.0), Strict (3.0) |
+| Focus restored windows | Off | When on, explicitly focuses the restored window |
+| Show on-screen feedback | On | OSD icon for performed and skipped actions |
+
+All settings are stored in GSettings under
+`org.gnome.shell.extensions.gestura` and persist across sessions.
+
+## How it works
+
+A capture-phase handler on the Shell stage observes `TOUCHPAD_SWIPE` events before
+GNOME's own swipe trackers. A pure state machine classifies four-finger vertical
+movement, claims the gesture with `EVENT_STOP`, and dispatches one action per
+physical swipe. Window history is maintained separately by tracking window
+creation and `notify::minimized` signals.
+
+In `NORMAL` mode Gestura intentionally replaces GNOME's four-finger
+swipe-up-to-overview gesture. The overview remains available via Super, the
+Activities button, or the hot corner. Stricter swipe settings hand more
+diagonal gestures back to GNOME's overview tracker.
 
 ## Troubleshooting
 
-- **Not listed after install:** log out/in; GNOME 51 does not scan extension directories while running.
-- **No action on a swipe:** check the two switches in Preferences, make sure a normal/dialog window has focus, and confirm the swipe is long enough. The Shell journal logs each gesture as `performed` or `no-op`.
-- **Swipe-up no longer opens Overview:** intentional in normal mode. Use Super, the Activities button, or the hot corner.
-- **Need to remove it:** `gnome-extensions uninstall gestura@sakibshahariar.github.io`, then log out/in.
+- **Extension not listed after install:** log out/in; GNOME 51 does not rescan
+  extension directories while running.
+- **No action on a swipe:** check the gesture switches in Preferences, make
+  sure a normal/dialog window has focus, and confirm the swipe is long enough.
+  The journal logs each gesture as `performed` or `no-op`.
+- **Swipe-up no longer opens Overview:** intentional in normal mode.
+- **Preferences fail to open:** reinstall the bundle and reopen; preferences
+  load from disk each time.
+- **Inspect logs:** `journalctl --user -f | grep Gestura`.
 
 ## Development
 
@@ -66,8 +128,12 @@ npm run benchmark                    # recognizer hot-path µs/event + CI guard
 python3 scripts/package.py           # reproducible distributable ZIP
 ```
 
-The packaging script uses an explicit file list, so development-only files (tests, docs, CI config) are never shipped. See [AGENTS.md](AGENTS.md) for project rules and [GitHub Issues](https://github.com/SakibShahariar/gestura/issues) for the roadmap.
+The packaging script uses an explicit runtime-file list, so tests, docs, CI
+configuration, and other development-only files are never shipped. Project
+rules live in [AGENTS.md](AGENTS.md); the roadmap is in
+[GitHub Issues](https://github.com/SakibShahariar/gestura/issues).
 
 ## License
 
-Gestura is licensed under the GNU General Public License, version 3 or (at your option) any later version. See [LICENSE](LICENSE).
+Gestura is licensed under the GNU General Public License, version 3 or (at your
+option) any later version. See [LICENSE](LICENSE).
