@@ -47,9 +47,6 @@ back in. Then enable the extension:
 gnome-extensions enable gestura@sakibshahariar.github.io
 ```
 
-> Extension Manager 0.7.0 cannot install local extensions — it only installs
-> from extensions.gnome.org. Use the bundle method above.
-
 ### 2. Development install (symlink)
 
 For working directly from the checkout:
