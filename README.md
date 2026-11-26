@@ -1,8 +1,8 @@
 # Gestura
 
-A GNOME Shell extension that turns **four-finger vertical touchpad swipes** into
-window actions. No daemon, no root access, no broad input-device permissions —
-just an in-process GJS extension.
+A GNOME Shell extension that turns **four-finger touchpad swipes** into window
+actions. No daemon, no root access, no broad input-device permissions — just an
+in-process GJS extension.
 
 ## Features
 
@@ -99,9 +99,9 @@ All settings are stored in GSettings under
 
 A capture-phase handler on the Shell stage observes `TOUCHPAD_SWIPE` events before
 GNOME's own swipe trackers. A pure state machine classifies four-finger vertical
-movement, claims the gesture with `EVENT_STOP`, and dispatches one action per
-physical swipe. Window history is maintained separately by tracking window
-creation and `notify::minimized` signals.
+and horizontal movement, claims the gesture with `EVENT_STOP`, and dispatches one
+action per physical swipe. Window history is maintained separately by tracking
+window creation and `notify::minimized` signals.
 
 In `NORMAL` mode Gestura intentionally replaces GNOME's four-finger
 swipe-up-to-overview gesture. The overview remains available via Super, the
@@ -111,6 +111,17 @@ off, horizontal swipes are left to GNOME. Stricter swipe settings hand more
 diagonal gestures back to GNOME's trackers. Workspace moves never wrap around
 or create workspaces — an edge is a harmless no-op.
 
+## Limitations
+
+- Only **four-finger** swipes are recognized; three- and five-finger gestures
+  remain GNOME's.
+- libinput reports one gesture with one finger count at a time, so mixed
+  "3 + 4 fingers" gestures, adding a finger mid-swipe, and sequential gesture
+  chords are not supported.
+- Modifier-key combinations (for example Ctrl + four-finger swipe) are not
+  implemented.
+- Only GNOME Shell 51 on Wayland is supported.
+
 ## Troubleshooting
 
 - **Extension not listed after install:** log out/in; GNOME 51 does not rescan
@@ -118,7 +129,9 @@ or create workspaces — an edge is a harmless no-op.
 - **No action on a swipe:** check the gesture switches in Preferences, make
   sure a normal/dialog window has focus, and confirm the swipe is long enough.
   The journal logs each gesture as `performed` or `no-op`.
-- **Swipe-up no longer opens Overview:** intentional in normal mode.
+- **Swipe-up no longer opens Overview:** intentional in normal mode. Likewise,
+  enabling horizontal workspace moves replaces GNOME's own four-finger
+  horizontal workspace switching; turn the setting off to restore it.
 - **Preferences fail to open:** reinstall the bundle and reopen; preferences
   load from disk each time.
 - **Inspect logs:** `journalctl --user -f | grep Gestura`.
