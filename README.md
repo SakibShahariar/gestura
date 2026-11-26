@@ -27,7 +27,8 @@ swipes are also left to GNOME while workspace moves are disabled.
 - A touchpad that reports four-finger swipe gestures through libinput
 - `glib-compile-schemas` for building the bundle (provided by GLib tools)
 
-Only GNOME Shell 51 on Wayland is supported; other versions and X11 are not.
+Gestura is supported only on GNOME Shell 51 with Wayland. Other GNOME versions
+and X11 are not supported.
 For API details and verification evidence, see
 [docs/wayland-gesture-investigation.md](docs/wayland-gesture-investigation.md).
 
