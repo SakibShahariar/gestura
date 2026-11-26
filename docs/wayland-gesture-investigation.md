@@ -71,8 +71,12 @@ Both accept three or more fingers. Consequently:
   own that gesture. Gestura claims it **intentionally**; the overview remains
   reachable with the keyboard, the hot corner, or a click on the Activities
   button. This is a user-visible trade-off, not a side effect.
-- Four-finger **horizontal** swipes overlap workspace switching and are
-  **not** claimed by Gestura.
+- Four-finger **horizontal** swipes overlap workspace switching. By default
+  they are **not** claimed by Gestura and remain GNOME's. When the opt-in
+  `enable-workspace-move` setting is on, Gestura claims them in capture phase
+  using the same sub-16-unit classification, so GNOME's horizontal tracker
+  never enters its handling state. The focused window is then moved to the
+  adjacent workspace; edges are no-ops.
 - Three-finger gestures are never claimed.
 - In modes other than `NORMAL` (overview, lock screen, modal dialogs) Gestura
   propagates every touchpad event unchanged, so built-in behavior is intact.

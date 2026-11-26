@@ -10,15 +10,17 @@ just an in-process GJS extension.
 | --- | --- |
 | Four-finger swipe down | Minimize the focused, eligible window (never closes it) |
 | Four-finger swipe up | Restore the most recently minimized window (LIFO) |
+| Four-finger swipe left/right | Move the focused window to the previous/next workspace (opt-in) |
 
 The restore stack includes windows minimized **by any method** — Gestura watches
 Mutter's window signals, so clicking a minimize button or using Alt+F7 also adds
 to the stack. Unminimized and closed windows are removed; an empty stack is a
 harmless no-op.
 
-Three-finger gestures, four-finger horizontal swipes, diagonal swipes (subject
-to the strictness setting), cancelled gestures, and non-`NORMAL` input modes are
-passed through to GNOME untouched.
+Three-finger gestures, diagonal swipes (subject to the strictness setting),
+cancelled gestures, and non-`NORMAL` input modes are passed through to GNOME
+untouched. Horizontal swipes are passed through while the workspace-move
+setting is off.
 
 ## Requirements
 
@@ -84,6 +86,7 @@ icon in Extension Manager.
 | --- | --- | --- |
 | Minimize on swipe down | On | Requires a focused normal/dialog window |
 | Restore on swipe up | On | Restores the newest minimized window |
+| Move window on horizontal swipe | Off | Left/right moves the focused window between workspaces |
 | Gesture sensitivity | 100 | 40-300 unaccelerated units before an action fires |
 | Vertical swipe strictness | Balanced | Relaxed (1.0), Balanced (2.0), Strict (3.0) |
 | Focus restored windows | Off | When on, explicitly focuses the restored window |
@@ -102,8 +105,11 @@ creation and `notify::minimized` signals.
 
 In `NORMAL` mode Gestura intentionally replaces GNOME's four-finger
 swipe-up-to-overview gesture. The overview remains available via Super, the
-Activities button, or the hot corner. Stricter swipe settings hand more
-diagonal gestures back to GNOME's overview tracker.
+Activities button, or the hot corner. Enabling horizontal workspace moves also
+replaces GNOME's four-finger horizontal workspace switching; with the setting
+off, horizontal swipes are left to GNOME. Stricter swipe settings hand more
+diagonal gestures back to GNOME's trackers. Workspace moves never wrap around
+or create workspaces — an edge is a harmless no-op.
 
 ## Troubleshooting
 

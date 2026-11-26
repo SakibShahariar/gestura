@@ -11,6 +11,8 @@ export const GesturePhase = Object.freeze({
 export const Direction = Object.freeze({
     UP: 'up',
     DOWN: 'down',
+    LEFT: 'left',
+    RIGHT: 'right',
 });
 
 export const STRICTNESS_PRESETS = Object.freeze([
@@ -35,7 +37,7 @@ const State = Object.freeze({
 });
 
 /**
- * Recognizes four-finger vertical touchpad swipes.
+ * Recognizes four-finger touchpad swipes with configurable orientations.
  *
  * The recognizer is deliberately kept independent from event sources and
  * actions. `handleEvent()` returns whether the event was claimed by Gestura;
@@ -47,6 +49,7 @@ export class GestureRecognizer {
         classifyThreshold = 12,
         actionThreshold = 100,
         diagonalRatio = 2,
+        allowedOrientations = ['vertical'],
         onGesture = () => {},
     } = {}) {
         if (!Number.isInteger(fingerCount) || fingerCount < 1)
@@ -55,6 +58,10 @@ export class GestureRecognizer {
             throw new TypeError('actionThreshold must be a positive number');
         if (!Number.isFinite(diagonalRatio) || diagonalRatio < 1)
             throw new TypeError('diagonalRatio must be a number >= 1');
+        if (!Array.isArray(allowedOrientations) ||
+            allowedOrientations.length === 0 ||
+            allowedOrientations.some(o => !['vertical', 'horizontal'].includes(o)))
+            throw new TypeError('allowedOrientations must contain vertical and/or horizontal');
         if (typeof onGesture !== 'function')
             throw new TypeError('onGesture must be a function');
 
@@ -65,6 +72,7 @@ export class GestureRecognizer {
         this.classifyThreshold = Math.min(Math.max(classifyThreshold, 1), 15);
         this.actionThreshold = actionThreshold;
         this.diagonalRatio = diagonalRatio;
+        this.allowedOrientations = [...allowedOrientations];
         this.onGesture = onGesture;
 
         this.reset();
@@ -75,6 +83,7 @@ export class GestureRecognizer {
         this._cumulativeX = 0;
         this._cumulativeY = 0;
         this._distance = 0;
+        this._orientation = null;
         this._direction = null;
         this._fired = false;
         this._claimed = false;
@@ -153,21 +162,33 @@ export class GestureRecognizer {
             if (distance < this.classifyThreshold)
                 return false;
 
-            const vertical = Math.abs(this._cumulativeY) >=
-                this.diagonalRatio * Math.abs(this._cumulativeX);
-            if (!vertical) {
-                // Horizontal or diagonal: leave it to GNOME.
+            const absX = Math.abs(this._cumulativeX);
+            const absY = Math.abs(this._cumulativeY);
+            const vertical = absY >= this.diagonalRatio * absX;
+            const horizontal = absX >= this.diagonalRatio * absY;
+
+            let orientation = null;
+            if (vertical && this.allowedOrientations.includes('vertical'))
+                orientation = 'vertical';
+            else if (horizontal && this.allowedOrientations.includes('horizontal'))
+                orientation = 'horizontal';
+
+            if (!orientation) {
+                // Diagonal, or an orientation we do not handle: leave it to GNOME.
                 this.reset();
                 this._state = State.IGNORED;
                 return false;
             }
 
-            this._direction = this._cumulativeY < 0 ? Direction.UP : Direction.DOWN;
+            this._orientation = orientation;
+            this._direction = orientation === 'vertical'
+                ? (this._cumulativeY < 0 ? Direction.UP : Direction.DOWN)
+                : (this._cumulativeX < 0 ? Direction.LEFT : Direction.RIGHT);
             this._state = State.HANDLING;
             this._claimed = true;
         }
 
-        this._distance += dy;
+        this._distance += this._orientation === 'horizontal' ? dx : dy;
         this._maybeFire(time);
         return true;
     }
@@ -176,7 +197,7 @@ export class GestureRecognizer {
         if (this._fired || this._state !== State.HANDLING || !this._direction)
             return;
 
-        const travelled = this._direction === Direction.UP
+        const travelled = [Direction.UP, Direction.LEFT].includes(this._direction)
             ? -this._distance
             : this._distance;
 
@@ -184,6 +205,7 @@ export class GestureRecognizer {
             this._fired = true;
             this.onGesture({
                 direction: this._direction,
+                orientation: this._orientation,
                 distance: travelled,
                 time,
             });

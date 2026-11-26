@@ -170,6 +170,45 @@ test('classification threshold is kept below GNOME Shell 51 threshold', () => {
     assert.equal(recognizer.classifyThreshold, 15);
 });
 
+test('recognizes four-finger horizontal swipes when enabled', () => {
+    const {recognizer, gestures} = makeRecognizer({
+        allowedOrientations: ['vertical', 'horizontal'],
+    });
+    let claimed = send(recognizer, GesturePhase.BEGIN, 4);
+    for (let i = 0; i < 20; i++)
+        claimed = send(recognizer, GesturePhase.UPDATE, 4, 10, 0) || claimed;
+    send(recognizer, GesturePhase.END, 4);
+
+    assert.equal(claimed, true);
+    assert.equal(gestures.length, 1);
+    assert.equal(gestures[0].direction, Direction.RIGHT);
+    assert.equal(gestures[0].orientation, 'horizontal');
+});
+
+test('recognizes leftward horizontal swipes', () => {
+    const {recognizer, gestures} = makeRecognizer({
+        allowedOrientations: ['vertical', 'horizontal'],
+    });
+    send(recognizer, GesturePhase.BEGIN, 4);
+    for (let i = 0; i < 20; i++)
+        send(recognizer, GesturePhase.UPDATE, 4, -10, 0);
+    send(recognizer, GesturePhase.END, 4);
+
+    assert.equal(gestures[0].direction, Direction.LEFT);
+});
+
+test('diagonal swipes stay ignored when both orientations are enabled', () => {
+    const {recognizer, gestures} = makeRecognizer({
+        allowedOrientations: ['vertical', 'horizontal'],
+    });
+    send(recognizer, GesturePhase.BEGIN, 4);
+    const result = send(recognizer, GesturePhase.UPDATE, 4, 10, 12);
+    send(recognizer, GesturePhase.END, 4);
+
+    assert.equal(result, false);
+    assert.equal(gestures.length, 0);
+});
+
 test('strictness presets map to documented ratios', () => {
     assert.deepEqual(STRICTNESS_PRESETS.map(p => p.ratio), [1, 2, 3]);
     assert.deepEqual([0, 1, 2].map(ratioForStrictness), [1, 2, 3]);
@@ -198,4 +237,6 @@ test('configuration is validated', () => {
     assert.throws(() => new GestureRecognizer({fingerCount: 0}), TypeError);
     assert.throws(() => new GestureRecognizer({diagonalRatio: 0}), TypeError);
     assert.throws(() => new GestureRecognizer({onGesture: null}), TypeError);
+    assert.throws(() => new GestureRecognizer({allowedOrientations: []}), TypeError);
+    assert.throws(() => new GestureRecognizer({allowedOrientations: ['diagonal']}), TypeError);
 });

@@ -17,6 +17,15 @@
         window.
       </description>
     </key>
+    <key name="enable-workspace-move" type="b">
+      <default>false</default>
+      <summary>Move window on horizontal swipe</summary>
+      <description>
+        Allow a four-finger horizontal swipe to move the focused window to the
+        adjacent workspace. Off by default; enabling it replaces GNOME's
+        four-finger horizontal workspace switching.
+      </description>
+    </key>
     <key name="diagonal-strictness" type="i">
       <range min="0" max="2"/>
       <default>1</default>

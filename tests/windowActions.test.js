@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import {Direction} from '../gestureRecognizer.js';
 import {WindowActions} from '../windowActions.js';
 import {WindowHistory} from '../windowHistory.js';
 
@@ -127,6 +128,65 @@ test('destroyed windows are discarded, not restored', () => {
 
     assert.equal(actions.restoreLast(), false);
     assert.equal(destroyed.unminimizeCalls, 0);
+});
+
+function makeWorkspaceManager({count = 3, current = 1} = {}) {
+    return {
+        get_n_workspaces: () => count,
+        get_active_workspace_index: () => current,
+        get_workspace_by_index(index) {
+            return index >= 0 && index < count ? {index} : null;
+        },
+    };
+}
+
+function movingWindow() {
+    const window = makeWindow();
+    window.change_workspace = workspace => { window.workspace = workspace; };
+    return window;
+}
+
+test('moves the focused window to the right workspace', () => {
+    const {actions} = makeActions();
+    const window = movingWindow();
+    const display = {get_focus_window: () => window};
+
+    assert.equal(actions.moveFocusedToWorkspace(
+        Direction.RIGHT, display, makeWorkspaceManager({current: 0})), true);
+    assert.equal(window.workspace.index, 1);
+});
+
+test('moves the focused window to the left workspace', () => {
+    const {actions} = makeActions();
+    const window = movingWindow();
+    const display = {get_focus_window: () => window};
+
+    assert.equal(actions.moveFocusedToWorkspace(
+        Direction.LEFT, display, makeWorkspaceManager({current: 2})), true);
+    assert.equal(window.workspace.index, 1);
+});
+
+test('workspace edges are harmless no-ops', () => {
+    const {actions} = makeActions();
+    const window = movingWindow();
+    const display = {get_focus_window: () => window};
+
+    assert.equal(actions.moveFocusedToWorkspace(
+        Direction.LEFT, display, makeWorkspaceManager({current: 0})), false);
+    assert.equal(actions.moveFocusedToWorkspace(
+        Direction.RIGHT, display, makeWorkspaceManager({current: 2})), false);
+    assert.equal(window.workspace, undefined);
+});
+
+test('no focus or ineligible window cannot be moved', () => {
+    const noFocus = makeActions().actions;
+    assert.equal(noFocus.moveFocusedToWorkspace(
+        Direction.RIGHT, {get_focus_window: () => null}, makeWorkspaceManager()), false);
+
+    const ineligible = makeActions({eligible: false}).actions;
+    assert.equal(ineligible.moveFocusedToWorkspace(
+        Direction.RIGHT, {get_focus_window: () => movingWindow()},
+        makeWorkspaceManager()), false);
 });
 
 test('unminimize errors are swallowed', () => {

@@ -25,6 +25,9 @@ export default class GesturaPreferences extends ExtensionPreferences {
         gestures.add(this._switch(settings, 'enable-restore',
             'Restore on swipe up',
             'Restores the most recently minimized window, however it was minimized.'));
+        gestures.add(this._switch(settings, 'enable-workspace-move',
+            'Move window on horizontal swipe',
+            'Off by default; replaces GNOME’s four-finger horizontal workspace switching.'));
 
         const threshold = new Adw.SpinRow({
             title: 'Gesture sensitivity',

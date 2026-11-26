@@ -44,6 +44,7 @@ export default class GesturaExtension extends Extension {
             actionThreshold: this._settings.get_int('action-threshold'),
             diagonalRatio: ratioForStrictness(
                 this._settings.get_int('diagonal-strictness')),
+            allowedOrientations: this._allowedOrientations(),
             onGesture: ({direction, distance, time}) =>
                 this._onGesture(direction, distance, time),
         });
@@ -55,6 +56,9 @@ export default class GesturaExtension extends Extension {
         this._strictnessId = this._settings.connect('changed::diagonal-strictness', () => {
             this._recognizer.diagonalRatio = ratioForStrictness(
                 this._settings.get_int('diagonal-strictness'));
+        });
+        this._workspaceMoveId = this._settings.connect('changed::enable-workspace-move', () => {
+            this._recognizer.allowedOrientations = this._allowedOrientations();
         });
 
         // Capture phase runs before GNOME Shell's own swipe trackers, which
@@ -74,6 +78,9 @@ export default class GesturaExtension extends Extension {
         if (this._strictnessId)
             this._settings.disconnect(this._strictnessId);
         this._strictnessId = null;
+        if (this._workspaceMoveId)
+            this._settings.disconnect(this._workspaceMoveId);
+        this._workspaceMoveId = null;
 
         this._recognizer?.reset();
         this._recognizer = null;
@@ -126,12 +133,24 @@ export default class GesturaExtension extends Extension {
 
     _onGesture(direction, distance, time) {
         let action = null;
-        if (direction === Direction.DOWN &&
-            this._settings.get_boolean('enable-minimize'))
-            action = 'minimize';
-        else if (direction === Direction.UP &&
-            this._settings.get_boolean('enable-restore'))
-            action = 'restore';
+        switch (direction) {
+        case Direction.DOWN:
+            if (this._settings.get_boolean('enable-minimize'))
+                action = 'minimize';
+            break;
+        case Direction.UP:
+            if (this._settings.get_boolean('enable-restore'))
+                action = 'restore';
+            break;
+        case Direction.LEFT:
+            if (this._settings.get_boolean('enable-workspace-move'))
+                action = 'workspace-left';
+            break;
+        case Direction.RIGHT:
+            if (this._settings.get_boolean('enable-workspace-move'))
+                action = 'workspace-right';
+            break;
+        }
 
         if (!action) {
             console.log(`Gestura: swipe ${direction} ignored (disabled in preferences)`);
@@ -143,9 +162,17 @@ export default class GesturaExtension extends Extension {
             ? window => window.focus(global.get_current_time())
             : null;
 
-        const performed = action === 'minimize'
-            ? this._actions.minimizeFocused(global.display)
-            : this._actions.restoreLast({focusWindow});
+        let performed;
+        if (action === 'workspace-left' || action === 'workspace-right') {
+            const workspaceDirection = action === 'workspace-left'
+                ? Direction.LEFT : Direction.RIGHT;
+            performed = this._actions.moveFocusedToWorkspace(
+                workspaceDirection, global.display, global.workspace_manager);
+        } else if (action === 'minimize') {
+            performed = this._actions.minimizeFocused(global.display);
+        } else {
+            performed = this._actions.restoreLast({focusWindow});
+        }
 
         console.log(`Gestura: swipe ${direction} -> ${action} ` +
             `${performed ? 'performed' : 'no-op'} ` +
@@ -153,6 +180,12 @@ export default class GesturaExtension extends Extension {
 
         const feedback = feedbackFor(action, performed);
         this._showFeedback(feedback);
+    }
+
+    _allowedOrientations() {
+        return this._settings.get_boolean('enable-workspace-move')
+            ? ['vertical', 'horizontal']
+            : ['vertical'];
     }
 
     _showFeedback({iconName, label}) {

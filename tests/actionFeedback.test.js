@@ -24,6 +24,23 @@ test('no-op outcomes use an information icon', () => {
     assert.match(feedbackFor('restore', false).label, /No window/);
 });
 
+test('workspace moves use directional icons', () => {
+    assert.deepEqual(feedbackFor('workspace-left', true), {
+        iconName: 'go-previous-symbolic',
+        label: 'Window moved left',
+    });
+    assert.deepEqual(feedbackFor('workspace-right', true), {
+        iconName: 'go-next-symbolic',
+        label: 'Window moved right',
+    });
+});
+
+test('workspace no-ops use an information icon', () => {
+    assert.equal(feedbackFor('workspace-left', false).iconName,
+        'dialog-information-symbolic');
+    assert.match(feedbackFor('workspace-right', false).label, /No workspace/);
+});
+
 test('unknown actions fall back safely', () => {
     assert.deepEqual(feedbackFor(null, true), {
         iconName: 'dialog-information-symbolic',
