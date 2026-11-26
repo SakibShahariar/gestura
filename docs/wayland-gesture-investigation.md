@@ -170,6 +170,9 @@ revisited; this dependency is documented here rather than hidden in code.
 - [x] **Strictness presets verified on hardware.** Diagonal swipes follow the
       selected Relaxed/Balanced/Strict preset and preset changes apply without
       logout; vertical swipes still perform normally (2026-11-25 23:47-23:48).
+- [x] **Horizontal workspace moves verified on hardware.** Journal at
+      2026-11-26 23:27 shows left/right workspace moves, a no-op at the edge,
+      and unchanged vertical minimize/restore at 23:28.
 
 ### Verification checklist (GNOME 51, Wayland)
 
