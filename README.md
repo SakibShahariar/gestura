@@ -14,13 +14,12 @@ in-process GJS extension.
 
 The restore stack includes windows minimized **by any method** — Gestura watches
 Mutter's window signals, so clicking a minimize button or using Alt+F7 also adds
-to the stack. Unminimized and closed windows are removed; an empty stack is a
-harmless no-op.
+them. Restored and closed windows are removed, and an empty stack simply does
+nothing.
 
-Three-finger gestures, diagonal swipes (subject to the strictness setting),
-cancelled gestures, and non-`NORMAL` input modes are passed through to GNOME
-untouched. Horizontal swipes are passed through while the workspace-move
-setting is off.
+Three-finger gestures, cancelled gestures, diagonal swipes (depending on the
+strictness setting), and non-`NORMAL` input modes are left to GNOME. Horizontal
+swipes are also left to GNOME while workspace moves are disabled.
 
 ## Requirements
 
@@ -28,8 +27,9 @@ setting is off.
 - A touchpad that reports four-finger swipe gestures through libinput
 - `glib-compile-schemas` for building the bundle (provided by GLib tools)
 
-No other GNOME version or X11 support is claimed. For the API investigation and
-verification evidence, see [docs/wayland-gesture-investigation.md](docs/wayland-gesture-investigation.md).
+Only GNOME Shell 51 on Wayland is supported; other versions and X11 are not.
+For API details and verification evidence, see
+[docs/wayland-gesture-investigation.md](docs/wayland-gesture-investigation.md).
 
 ## Installation
 
@@ -60,7 +60,8 @@ ln -s "$PWD/gestura" \
 ```
 
 Log out and back in, then enable it with `gnome-extensions enable` or in
-Extension Manager. After changing code, log out/in again to reload it.
+Extension Manager. After changing the code, log out and back in again to
+reload it.
 
 ### Enable, disable, update, uninstall
 
@@ -86,22 +87,22 @@ icon in Extension Manager.
 | --- | --- | --- |
 | Minimize on swipe down | On | Requires a focused normal/dialog window |
 | Restore on swipe up | On | Restores the newest minimized window |
-| Move window on horizontal swipe | Off | Left/right moves the focused window between workspaces |
+| Move window on horizontal swipe | Off | Moves the focused window between workspaces |
 | Gesture sensitivity | 100 | 40-300 unaccelerated units before an action fires |
 | Vertical swipe strictness | Balanced | Relaxed (1.0), Balanced (2.0), Strict (3.0) |
 | Focus restored windows | Off | When on, explicitly focuses the restored window |
-| Show on-screen feedback | On | OSD icon for performed and skipped actions |
+| Show on-screen feedback | On | Shows an OSD icon when an action runs or is skipped |
 
 All settings are stored in GSettings under
 `org.gnome.shell.extensions.gestura` and persist across sessions.
 
 ## How it works
 
-A capture-phase handler on the Shell stage observes `TOUCHPAD_SWIPE` events before
-GNOME's own swipe trackers. A pure state machine classifies four-finger vertical
-and horizontal movement, claims the gesture with `EVENT_STOP`, and dispatches one
-action per physical swipe. Window history is maintained separately by tracking
-window creation and `notify::minimized` signals.
+A capture-phase handler on the Shell stage sees `TOUCHPAD_SWIPE` events before
+GNOME's swipe trackers. A pure state machine classifies four-finger movement,
+claims the gesture with `EVENT_STOP`, and runs one action per physical swipe.
+Window history is kept separately by tracking window creation and
+`notify::minimized` signals.
 
 In `NORMAL` mode Gestura intentionally replaces GNOME's four-finger
 swipe-up-to-overview gesture. The overview remains available via Super, the
@@ -113,23 +114,23 @@ or create workspaces — an edge is a harmless no-op.
 
 ## Troubleshooting
 
-- **Extension not listed after install:** log out/in; GNOME 51 does not rescan
-  extension directories while running.
+- **Extension not listed after install:** log out and back in; GNOME 51 does
+  not rescan extension directories while running.
 - **No action on a swipe:** check the gesture switches in Preferences, make
   sure a normal/dialog window has focus, and confirm the swipe is long enough.
   The journal logs each gesture as `performed` or `no-op`.
 - **Swipe-up no longer opens Overview:** intentional in normal mode. Likewise,
   enabling horizontal workspace moves replaces GNOME's own four-finger
   horizontal workspace switching; turn the setting off to restore it.
-- **Preferences fail to open:** reinstall the bundle and reopen; preferences
-  load from disk each time.
+- **Preferences fail to open:** reinstall the bundle, then reopen Preferences;
+  the prefs window is loaded from disk each time it opens.
 - **Inspect logs:** `journalctl --user -f | grep Gestura`.
 
 ## Development
 
 ```sh
 npm test                             # pure logic unit tests
-npm run benchmark                    # recognizer hot-path µs/event + CI guard
+npm run benchmark                    # recognizer hot-path timing + CI guard
 python3 scripts/package.py           # reproducible distributable ZIP
 ```
 
