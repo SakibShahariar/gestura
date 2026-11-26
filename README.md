@@ -111,17 +111,6 @@ off, horizontal swipes are left to GNOME. Stricter swipe settings hand more
 diagonal gestures back to GNOME's trackers. Workspace moves never wrap around
 or create workspaces — an edge is a harmless no-op.
 
-## Limitations
-
-- Only **four-finger** swipes are recognized; three- and five-finger gestures
-  remain GNOME's.
-- libinput reports one gesture with one finger count at a time, so mixed
-  "3 + 4 fingers" gestures, adding a finger mid-swipe, and sequential gesture
-  chords are not supported.
-- Modifier-key combinations (for example Ctrl + four-finger swipe) are not
-  implemented.
-- Only GNOME Shell 51 on Wayland is supported.
-
 ## Troubleshooting
 
 - **Extension not listed after install:** log out/in; GNOME 51 does not rescan
